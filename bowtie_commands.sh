@@ -12,22 +12,21 @@ SAMPLE_DIR=`echo $1 | grep -o "MURI_[0-9]\+"`
 echo "BASE_NAME: $BASE_NAME"
 echo "SAMPLE_DIR: $SAMPLE_DIR"
 
-if [ ! -d "$SAMPLE_DIR" ]; then
-   mkdir $SAMPLE_DIR	
+if [ ! -d "$SCRATCH/$SAMPLE_DIR" ]; then
+   mkdir $SCRATCH/$SAMPLE_DIR	
 fi
 
 
-if [ ! -d "$SAMPLE_DIR/raw_reads" ]; then
-   mkdir raw_reads
+if [ ! -d "$SCRATCH/$SAMPLE_DIR/raw_reads" ]; then
+   mkdir $SCRATCH/$SAMPLE_DIR/aw_reads
 fi 
 
-mv $BASE_NAME*.fastq $SAMPLE_DIR/raw_reads/
-cd $SAMPLE_DIR
+mv $BASE_NAME*.fastq $SCRATCH/$SAMPLE_DIR/raw_reads/
+cd $SCRATCH/$SAMPLE_DIR
 
 #gunzip raw_reads/*
 
 echo "flexbar -n 3 -t $BASE_NAME -r raw_reads/${BASE_NAME}_R1_001.fastq -p raw_reads/${BASE_NAME}_R2_001.fastq -f fastq -a $SCRATCH/adaptors.fna > ${BASE_NAME}_flexbar.out"
-TEST="false"
 if [[ ! $TEST = "true" ]]; then 
    flexbar -n 3 -t $BASE_NAME -r raw_reads/${BASE_NAME}_R1_001.fastq -p raw_reads/${BASE_NAME}_R2_001.fastq -f fastq -a $SCRATCH/adaptors.fna > ${BASE_NAME}_flexbar.out
 fi
@@ -42,7 +41,6 @@ echo "bowtie2 -x $SCRATCH/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -
 if [[ ! $TEST = "true" ]]; then 
    bowtie2 -x $SCRATCH/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_align_reads.txt
 fi
-TEST="true"
 
 ##Sort for cufflinks
 echo "sort -k 3,3 -k 4,4n ${BASE_NAME}_bowtie_out.sam > ${BASE_NAME}_bowtie_out_sorted.sam"
@@ -76,7 +74,13 @@ if [[ ! $TEST = "true" ]]; then
    samtools sort ${BASE_NAME}_bowtie_out.bam ${BASE_NAME}_bowtie_out_sorted
 fi
 
-echo "bedtools coverage -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $SCRATCH/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt"
+echo "bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $SCRATCH/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt"
 if [[ ! $TEST = "true" ]]; then 
-   bedtools coverage -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $SCRATCH/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt
+   bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $SCRATCH/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt
 fi
+
+echo "python $SCRATCH/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt"
+TEST = "false"
+if [[ ! $TEST = "true"]]; then
+	python $SCRATCH/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt
+fi 

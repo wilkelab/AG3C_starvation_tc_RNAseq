@@ -1,6 +1,5 @@
 import sys, re 
 
-
 def read_flexbar(file):	
 	##read flexbar and bowtie output files
 	flexbar_file = open(file,"r")
@@ -52,7 +51,7 @@ def read_bowtie(file,reads_trimmed):
 
 	return(reads_mapped, percent_mapped_reads)
 
-def count_bases_from_raw(file):
+def count_bases(file):
 	reads_file = open(file,"r")
 	count = 0
 	i = 0
@@ -61,25 +60,50 @@ def count_bases_from_raw(file):
 		if m: 
 			count += len(m.group(1))
 			i += 1
-	print i, count
 
+	return(i,count)
+
+def count_rna_type(file,reads_mapped):
+	count_rna_file = open(file,"r")
 	
+	count_mRNA = 0
+	count_tRNA = 0
+	count_rRNA = 0
 
+	for line in count_rna_file.readlines():
+		m = re.match(r'.+oId \"ECB\_([\drt])\d+.+',line)
+		if m:
+			m2 = re.match(r'.*\s(\d+)\s\d+\s\d+\s[\d\.]+$',line)
+			if re.match(r'\d',m.group(1)):
+				count_mRNA += int(m2.group(1))
+			elif m.group(1) == "t":
+				count_tRNA += int(m2.group(1))
+			elif m.group(1) == "r": 
+				count_rRNA += int(m2.group(1))
+					
+	percent_mRNA = count_mRNA/float(reads_mapped)*100
+	percent_tRNA = count_tRNA/float(reads_mapped)*100
+	percent_rRNA = count_rRNA/float(reads_mapped)*100				
+	return (count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA)	
+	
 def main():
-	(total_reads, percent_reads_remaining, reads_trimmed) = read_flexbar(sys.argv[1])
+	(total_reads_flexbar, percent_reads_remaining, reads_trimmed) = read_flexbar(sys.argv[1])
 	(reads_mapped, percent_mapped_reads) = read_bowtie(sys.argv[2],reads_trimmed)
-
+	(total_reads_raw_fastq, base_count_raw) = count_bases(sys.argv[3])
+	(total_reads_trimmed_fastq, base_count_trimmed) = count_bases(sys.argv[4])
+	(count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA) = count_rna_type(sys.argv[5],reads_mapped)	 
 	##make output file
 	outFile = open("test.txt","w")
 
+	m = re.match(r'^\S+(MURI_\d+)\S+',sys.argv[1])
+	if m:
+		sample = m.group(1)
+		
 	##write number of reads trimmed and discarded from flexbar
-	outFile.write("sample\ttime\ttotal_read_count\ttotal_base_count\ttrimmed_read_count\tpercent_reads_remaining\ttrimmed_base_count\tmapped_read_count\tpercent_trimmed_reads_mapped\tpercent_mapping_rRNA\tpercent_mapping_tRNA\tpercent_mapping_mRNA\tcount_mapping_to_mRNA\n")
-	row = "%s\ttime\t%i\ttotal_base_count\t%i\t%.4g\ttrimmed_base_count\t%i\t%.4g\n" % (sys.argv[1][:7], 
-	total_reads, 
-	reads_trimmed, percent_reads_remaining, reads_mapped, percent_mapped_reads )
+	outFile.write("sample\ttime\ttotal_read_count\ttotal_base_count\ttrimmed_read_count\tpercent_reads_remaining\ttrimmed_base_count\tmapped_read_count\tpercent_trimmed_reads_mapped\tcount_mapping_mRNA\tpercent_mapping_mRNA\tpercent_mapping_tRNA\tpercent_mapping_to_rRNA\n")
+	row = "%s\ttime\t%i\t%i\t%i\t%.4g\t%i\t%i\t%.4g\t%i\t%.4g\t%.4g\t%.4g\n" % (sample, total_reads_flexbar, base_count_raw, reads_trimmed, percent_reads_remaining, base_count_trimmed, reads_mapped, percent_mapped_reads, count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA )
 	outFile.write(row)
 	outFile.close()
 
-#main()
+main()
 
-count_bases_from_raw("MURI_16/raw_reads/MURI_16_AGTTCC_L007_R1_001.fastq")

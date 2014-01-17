@@ -1,3 +1,6 @@
+TACC: Setting memory limits for job 1721020 to unlimited KB
+TACC: Dumping job script:
+--------------------------------------------------------------------------------
 #!/bin/csh
 #
 # Simple SGE script for submitting multiple serial
@@ -97,3 +100,11 @@ $TACC_LAUNCHER_DIR/paramrun $EXECUTABLE $CONTROL_FILE
 echo " "
 echo " Parameteric Job Complete"
 echo " "
+--------------------------------------------------------------------------------
+TACC: Done.
+ 
+Error: unable to find input control file /scratch/02159/ds29583/Ecoli_RNAseq/paramlist_bowtie.
+ 
+Job not submitted.
+TACC: Cleaning up after job: 1721020
+TACC: Done.
