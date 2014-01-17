@@ -93,11 +93,12 @@ def main():
 	(total_reads_trimmed_fastq, base_count_trimmed) = count_bases(sys.argv[4])
 	(count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA) = count_rna_type(sys.argv[5],reads_mapped)	 
 	##make output file
-	outFile = open("test.txt","w")
 
-	m = re.match(r'^\S+(MURI_\d+)\S+',sys.argv[1])
+	m = re.match(r'^(MURI_\d+)\S+',sys.argv[1])	
 	if m:
 		sample = m.group(1)
+
+	outFile = open(sample+"_quality_control.txt","w")
 		
 	##write number of reads trimmed and discarded from flexbar
 	outFile.write("sample\ttime\ttotal_read_count\ttotal_base_count\ttrimmed_read_count\tpercent_reads_remaining\ttrimmed_base_count\tmapped_read_count\tpercent_trimmed_reads_mapped\tcount_mapping_mRNA\tpercent_mapping_mRNA\tpercent_mapping_tRNA\tpercent_mapping_to_rRNA\n")
