@@ -15,7 +15,8 @@
 #$ -N bowtie 
 #$ -pe 4way 48
 #$ -q normal
-#$ -o bowtie.o$JOB_ID
+#$ -o $SCRATCH/bowtie.o$JOB_ID
+#$ -e $SCRATCH/bowtie.e$JOB_ID
 #$ -l h_rt=5:00:00
 #$ -V
 #$ -M daria.sydykova@gmail.com
@@ -40,7 +41,7 @@ module load cufflinks/2.1.1
 module load bedtools
 module load samtools
 setenv EXECUTABLE     $TACC_LAUNCHER_DIR/init_launcher 
-setenv CONTROL_FILE   $SCRATCH/Ecoli_RNAseq/paramlist_bowtie
+setenv CONTROL_FILE   paramlist_bowtie
 setenv WORKDIR        $SCRATCH
 # 
 # Variable description:
