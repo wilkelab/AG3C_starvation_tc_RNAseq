@@ -13,30 +13,16 @@ echo "BASE_NAME: $BASE_NAME"
 echo "SAMPLE_DIR: $SAMPLE_DIR"
 
 ##create sample directory in data/
-if [ ! -d "data/$SAMPLE_DIR" ]; then
-   mkdir data/$SAMPLE_DIR	
+if [ ! -d "$SAMPLE_DIR" ]; then
+   mkdir $SAMPLE_DIR	
 fi
-
-##create a directory with raw reads in data/$SAMPLE_DIR
-if [ ! -d "data/$SAMPLE_DIR/raw_reads" ]; then
-   mkdir data/$SAMPLE_DIR/raw_reads
-fi 
-
-##move raw reads to data/$SAMPLE_DIR
-if [ -a "$BASE_NAME*.fastq" ]; then
-	mv $BASE_NAME*.fastq data/$SAMPLE_DIR/raw_reads/
-elif [ -a "data/$BASE_NAME*.fastq" ]; then
-	mv data/$BASE_NAME*.fastq data/$SAMPLE_DIR/raw_reads/
-elif [ -a "data/$SAMPLE_DIR/$BASE_NAME*fastq" ]; then
-	mv data/$SAMPLE_DIR/$BASE_NAME*fastq data/$SAMPLE_DIR/raw_reads/
-fi
-
-cd data/$SAMPLE_DIR
 
 ##unzip raw reads if zipped
-if [ -a "raw_reads/*fastq.gz" ]; then
-	gunzip raw_reads/*fastq.gz
+if [ -a "raw_reads/${BASE_NAME}*fastq.gz" ]; then
+	gunzip raw_reads/${BASE_NAME}*fastq.gz
 fi 
+
+cd $SAMPLE_DIR
 
 ##trim adaptors on raw reads and moved trimmed reads to trimmed_reads
 echo "flexbar -n 3 -t $BASE_NAME -r raw_reads/${BASE_NAME}_R1_001.fastq -p raw_reads/${BASE_NAME}_R2_001.fastq -f fastq -a $SCRATCH/Ecoli_RNAseq/adaptors.fna > ${BASE_NAME}_flexbar.out"
@@ -55,9 +41,9 @@ fi
 ##map trimmed reads to reference sequence in indexes file. 
 ##Index files were made with:
 ##bowtie2-build final_reference_seqs/REL606.fa indexes/REL606 
-echo "bowtie2 -x $SCRATCH/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_align_reads.txt"
+echo "bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_bowtie_out_k.txt"
 if [[ ! $TEST = "true" ]]; then 
-   bowtie2 -x $SCRATCH/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_align_reads.txt
+   bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_bowtie_out_k.txt
 fi
 
 ##Sort bowtie output file for cufflinks
@@ -67,9 +53,9 @@ if [[ ! $TEST = "true" ]]; then
 fi 
 
 ##calculate FPKMs using sorted bowtie output
-echo "cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $SCRATCH/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam"
+echo "cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam"
 if [[ ! $TEST = "true" ]]; then 
-   cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $SCRATCH/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam
+   cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam
 fi
 
 ##look for novel transcripts
@@ -80,9 +66,9 @@ if [[ ! $TEST = "true" ]]; then
 fi
 
 #compare novel reference GTF to the original GTF file
-echo "cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $SCRATCH/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf" 
+echo "cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf" 
 if [[ ! $TEST = "true" ]]; then 
-   cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $SCRATCH/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf
+   cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf
 fi
 
 ##convert bowtie output .sam to .bam
@@ -98,14 +84,14 @@ if [[ ! $TEST = "true" ]]; then
 fi
 
 ##get raw counts for reads mapped
-echo "bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $SCRATCH/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt"
+echo "bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt"
 if [[ ! $TEST = "true" ]]; then 
-   bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $SCRATCH/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt
+   bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b$HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt
 fi
 
 ##quality control 
-echo "python $SCRATCH/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt"
+echo "python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt"
 TEST = "false"
 if [[ ! $TEST = "true"]]; then
-	python $SCRATCH/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt
+	python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt
 fi 

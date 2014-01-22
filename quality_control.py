@@ -94,7 +94,7 @@ def main():
 	(count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA) = count_rna_type(sys.argv[5],reads_mapped)	 
 	##make output file
 
-	m = re.match(r'^(MURI_\d+)\S+',sys.argv[1])	
+	m = re.match(r'^(MURI_\d+_[AGCT]+_\w+)',sys.argv[1])	
 	if m:
 		sample = m.group(1)
 
