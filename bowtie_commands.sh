@@ -53,9 +53,9 @@ if [[ ! $TEST = "true" ]]; then
 fi 
 
 ##calculate FPKMs using sorted bowtie output
-echo "cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam"
+echo "cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam"
 if [[ ! $TEST = "true" ]]; then 
-   cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam
+   cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam
 fi
 
 ##look for novel transcripts
@@ -66,9 +66,9 @@ if [[ ! $TEST = "true" ]]; then
 fi
 
 #compare novel reference GTF to the original GTF file
-echo "cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf" 
+echo "cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf" 
 if [[ ! $TEST = "true" ]]; then 
-   cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf
+   cuffcompare -o ${BASE_NAME}_nc_cuffcompare_out -r $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_novel_trans_cufflinks_out/transcripts.gtf
 fi
 
 ##convert bowtie output .sam to .bam
@@ -84,14 +84,14 @@ if [[ ! $TEST = "true" ]]; then
 fi
 
 ##get raw counts for reads mapped
-echo "bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt"
+echo "bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt"
 if [[ ! $TEST = "true" ]]; then 
-   bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b$HOME/Ecoli_RNAseq/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt
+   bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_sorted.bam -b $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_out.txt
 fi
 
+TEST="false"
 ##quality control 
 echo "python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt"
-TEST = "false"
-if [[ ! $TEST = "true"]]; then
-	python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt
+if [[ ! $TEST = "true" ]]; then
+	python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_align_reads.txt $SCRATCH/data/raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_out.txt
 fi 
