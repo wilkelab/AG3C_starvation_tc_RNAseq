@@ -38,7 +38,7 @@ def read_bowtie(file,reads_trimmed):
 			break 
 
 	for line in bowtie_file_lst:
-		m = re.match( r'\s+\d+\s\((\d+\.\d+)\%\)\s+aligned concordantly exactly 1 time', line)
+		m = re.match( r'^.+\((\d+\.\d+)\%\)\s+aligned exactly 1 time\s$', line)
 		if m:
 			percent_mapped_reads = float( m.group(1) )
 			break
@@ -46,7 +46,7 @@ def read_bowtie(file,reads_trimmed):
 	if (reads_trimmed != total_reads_for_mapping):
 		print("Warning: reads trimmed and written by flexbar does not equal the total number of reads processed by bowtie")
 
-	reads_mapped = percent_mapped_reads/100.0*total_reads_for_mapping
+	reads_mapped = percent_mapped_reads/100*total_reads_for_mapping
 	bowtie_file.close()
 
 	return(reads_mapped, percent_mapped_reads)
