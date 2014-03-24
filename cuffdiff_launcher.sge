@@ -41,7 +41,7 @@ module load bedtools
 module load samtools
 setenv EXECUTABLE     $TACC_LAUNCHER_DIR/init_launcher 
 setenv CONTROL_FILE   paramlist_cuffdiff
-setenv WORKDIR        .
+setenv WORKDIR        $SCRATCH
 # 
 # Variable description:
 #

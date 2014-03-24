@@ -2,7 +2,7 @@
 
 SRC_DIR=$HOME/Ecoli_RNAseq
 
-read_1=($SCRATCH/data/raw_reads/unanalyzed/MURI_*_R1.fastq)
+read_1=($SCRATCH/data/raw_reads/unanalyzed/MURI_*_R1_001.fastq)
 
 rm -f $SCRATCH/data/paramlist_bowtie
 

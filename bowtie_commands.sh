@@ -3,10 +3,10 @@
 ## $2 = input fastq file for read 2
 
 TEST="false"
-#TEST="true"
+TEST="true"
 
 ## Example base name: MURI-12_S7_L001
-BASE_NAME=`echo $1 | grep -o "MURI_[0-9]\+_[AGCT]\+"`
+BASE_NAME=`echo $1 | grep -o "MURI_[0-9]\+_SA[0-9]\+_[AGCT]\+_L006"`
 SAMPLE_DIR=`echo $1 | grep -o "MURI_[0-9]\+"`
 
 echo "BASE_NAME: $BASE_NAME"
@@ -25,9 +25,9 @@ fi
 cd $SAMPLE_DIR
 
 ##trim adaptors on raw reads and moved trimmed reads to trimmed_reads
-echo "flexbar -n 3 -t $BASE_NAME -r $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1.fastq -p $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R2.fastq -f fastq -a $HOME/Ecoli_RNAseq/adaptors.fna > ${BASE_NAME}_flexbar.out"
+echo "flexbar -n 3 -t $BASE_NAME -r $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1_001.fastq -p $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R2_001.fastq -f fastq -a $HOME/Ecoli_RNAseq/adaptors.fna > ${BASE_NAME}_flexbar.out"
 if [[ ! $TEST = "true" ]]; then 
-   flexbar -n 3 -t $BASE_NAME -r $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1.fastq -p $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R2.fastq -f fastq -a $HOME/Ecoli_RNAseq/adaptors.fna > ${BASE_NAME}_flexbar.out
+   flexbar -n 3 -t $BASE_NAME -r $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1_001.fastq -p $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R2_001.fastq -f fastq -a $HOME/Ecoli_RNAseq/adaptors.fna > ${BASE_NAME}_flexbar.out
 fi
 
 if [ ! -d "trimmed_reads" ]; then
@@ -41,20 +41,28 @@ fi
 ##map trimmed reads to reference sequence in indexes file. 
 ##Index files were made with:
 ##bowtie2-build final_reference_seqs/REL606.fa indexes/REL606 
-echo "bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_bowtie_out_k.txt"
+#align both reads together 2
+echo "bowtie2 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_bowtie_out.txt"
 if [[ ! $TEST = "true" ]]; then 
-   bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_bowtie_out_k.txt
+   bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -1 trimmed_reads/${BASE_NAME}_1.fastq -2 trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out.sam 2> ${BASE_NAME}_bowtie_out.txt
 fi
 
-echo "bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -U trimmed_reads/${BASE_NAME}_1.fastq -S ${BASE_NAME}_bowtie_out_r1.sam 2> ${BASE_NAME}_bowtie_out_k_r1.txt"
+#align reads 1 separately
+echo "bowtie2 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -U trimmed_reads/${BASE_NAME}_1.fastq -S ${BASE_NAME}_bowtie_out_r1.sam 2> ${BASE_NAME}_bowtie_out_r1.txt"
 if [[ ! $TEST = "true" ]]; then 
-   bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -U trimmed_reads/${BASE_NAME}_1.fastq -S ${BASE_NAME}_bowtie_out_r1.sam 2> ${BASE_NAME}_bowtie_out_k_r1.txt
+   bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -U trimmed_reads/${BASE_NAME}_1.fastq -S ${BASE_NAME}_bowtie_out_r1.sam 2> ${BASE_NAME}_bowtie_out_r1.txt
+fi
+
+#align reads 2 separately
+echo "bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -U trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out_r2.sam 2> ${BASE_NAME}_bowtie_out_r2.txt"
+if [[ ! $TEST = "true" ]]; then 
+   bowtie2 -k 1 -q -x $HOME/Ecoli_RNAseq/indexes/REL606 -U trimmed_reads/${BASE_NAME}_2.fastq -S ${BASE_NAME}_bowtie_out_r2.sam 2> ${BASE_NAME}_bowtie_out_r2.txt
 fi
 
 ##Sort bowtie output file for cufflinks
-echo "sort -k 3,3 -k 4,4n ${BASE_NAME}_bowtie_out.sam > ${BASE_NAME}_bowtie_out_sorted.sam"
+echo "sort -k 3,3 -k 4,4n ${BASE_NAME}_bowtie_out.sam > ${BASE_NAME}_bowtie_out_r1_sorted.sam"
 if [[ ! $TEST = "true" ]]; then 
-   sort -k 3,3 -k 4,4n ${BASE_NAME}_bowtie_out.sam > ${BASE_NAME}_bowtie_out_sorted.sam
+   sort -k 3,3 -k 4,4n ${BASE_NAME}_bowtie_out_r1.sam > ${BASE_NAME}_bowtie_out_r1_sorted.sam
 fi 
 
 ##calculate FPKMs using sorted bowtie output
@@ -94,8 +102,32 @@ if [[ ! $TEST = "true" ]]; then
    bedtools coverage -s -abam ${BASE_NAME}_bowtie_out_r1_sorted.bam -b $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_bedtools_coverage_r1_out.txt
 fi
 
+##sort bedtools output files by nearest_ref or "ECB_" id
+#if [[ ! $TEST = "true" ]]; then
+#	sort -k 18,18 -o  ${BASE_NAME}_bedtools_coverage_r1_out_sorted_nearest_ref.txt ${BASE_NAME}_bedtools_coverage_r1_out.txt  
+#fi
+
+##use htseq to count RNA 
+#echo "htseq-count -m union -t exon -i nearest_ref ${BASE_NAME}_bowtie_out_r1_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_htseq_count_r1_k.txt"
+#if [[ ! $TEST = "true" ]]; then
+#	htseq-count -m union -t exon -i nearest_ref ${BASE_NAME}_bowtie_out_r1_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_htseq_count_r1_k.txt
+#fi
+
+TEST="false"
 ##quality control 
-echo "python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_bowtie_out_k_r1.txt raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_r1_out.txt"
+echo "python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_bowtie_out.txt ${BASE_NAME}_bowtie_out_r1.txt ${BASE_NAME}_bowtie_out_r2.txt $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_r1_out.txt"
 if [[ ! $TEST = "true" ]]; then
-	python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_bowtie_out_k_r1.txt $SCRATCH/data/raw_reads/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_r1_out.txt
+	python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_bowtie_out.txt ${BASE_NAME}_bowtie_out_r1.txt ${BASE_NAME}_bowtie_out_r2.txt $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_r1_out.txt
 fi 
+
+TEST="true"
+##R script to normalize QC htseq counts
+echo "Rscript normalize_counts.r ${BASE_NAME}_htseq_count_r1_k.txt ${BASE_NAME}_counts_normalized.txt"
+if [[ ! $TEST = "true" ]]; then
+	Rscript $HOME/Ecoli_RNAseq/normalize_htseq_counts.r ${BASE_NAME}_htseq_count_r1.txt ${BASE_NAME}_counts_normalized.txt 
+fi
+
+echo "Rscript $HOME/Ecoli_RNAseq/calculate_fpkm.r ${BASE_NAME}_bedtools_coverage_r1_out.txt ${BEST_NAME}_fpkm.txt 
+if [[ ! $TEST = "true" ]]; then
+	Rscript $HOME/Ecoli_RNAseq/calculate_fpkm.r ${BASE_NAME}_bedtools_coverage_r1_out.txt ${BEST_NAME}_fpkm.txt 
+fi
