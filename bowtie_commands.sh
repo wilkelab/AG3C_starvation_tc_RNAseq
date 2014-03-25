@@ -6,7 +6,7 @@ TEST="false"
 TEST="true"
 
 ## Example base name: MURI-12_S7_L001
-BASE_NAME=`echo $1 | grep -o "MURI_[0-9]\+_SA[0-9]\+_[AGCT]\+_L006"`
+BASE_NAME=`echo $1 | grep -o "MURI_[0-9]\+_SA[0-9]\+_[AGCT]\+_L[0-9]\+"`
 SAMPLE_DIR=`echo $1 | grep -o "MURI_[0-9]\+"`
 
 echo "BASE_NAME: $BASE_NAME"
