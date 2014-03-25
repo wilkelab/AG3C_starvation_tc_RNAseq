@@ -113,11 +113,14 @@ fi
 #	htseq-count -m union -t exon -i nearest_ref ${BASE_NAME}_bowtie_out_r1_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf > ${BASE_NAME}_htseq_count_r1_k.txt
 #fi
 
-TEST="false"
 ##quality control 
 echo "python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_bowtie_out.txt ${BASE_NAME}_bowtie_out_r1.txt ${BASE_NAME}_bowtie_out_r2.txt $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_r1_out.txt"
 if [[ ! $TEST = "true" ]]; then
 	python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_bowtie_out.txt ${BASE_NAME}_bowtie_out_r1.txt ${BASE_NAME}_bowtie_out_r2.txt $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_r1_out.txt
 fi 
 
-python $HOME/Ecoli_RNAseq/calculate_norm_fpkm.py $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_htseq_count_r1_k.txt
+##normalization 
+echo "python $HOME/Ecoli_RNAseq/calculate_norm_fpkm.py $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_htseq_count_r1_k.txt"
+if [[ ! $TEST = "true" ]]; then
+	python $HOME/Ecoli_RNAseq/calculate_norm_fpkm.py $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_htseq_count_r1_k.txt
+fi	
