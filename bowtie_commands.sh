@@ -120,14 +120,4 @@ if [[ ! $TEST = "true" ]]; then
 	python $HOME/Ecoli_RNAseq/quality_control.py ${BASE_NAME}_flexbar.out ${BASE_NAME}_bowtie_out.txt ${BASE_NAME}_bowtie_out_r1.txt ${BASE_NAME}_bowtie_out_r2.txt $SCRATCH/data/raw_reads/unanalyzed/${BASE_NAME}_R1_001.fastq trimmed_reads/${BASE_NAME}_1.fastq ${BASE_NAME}_bedtools_coverage_r1_out.txt
 fi 
 
-TEST="true"
-##R script to normalize QC htseq counts
-echo "Rscript normalize_counts.r ${BASE_NAME}_htseq_count_r1_k.txt ${BASE_NAME}_counts_normalized.txt"
-if [[ ! $TEST = "true" ]]; then
-	Rscript $HOME/Ecoli_RNAseq/normalize_htseq_counts.r ${BASE_NAME}_htseq_count_r1.txt ${BASE_NAME}_counts_normalized.txt 
-fi
-
-echo "Rscript $HOME/Ecoli_RNAseq/calculate_fpkm.r ${BASE_NAME}_bedtools_coverage_r1_out.txt ${BEST_NAME}_fpkm.txt 
-if [[ ! $TEST = "true" ]]; then
-	Rscript $HOME/Ecoli_RNAseq/calculate_fpkm.r ${BASE_NAME}_bedtools_coverage_r1_out.txt ${BEST_NAME}_fpkm.txt 
-fi
+python $HOME/Ecoli_RNAseq/calculate_norm_fpkm.py $HOME/Ecoli_RNAseq/reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_htseq_count_r1_k.txt
