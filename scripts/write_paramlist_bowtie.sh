@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SRC_DIR=$HOME/Ecoli_RNAseq
+SRC_DIR=$HOME/Ecoli_RNAseq/scripts/
 
 read_1=($SCRATCH/data/raw_reads/unanalyzed/MURI_*_R1_001.fastq)
 
