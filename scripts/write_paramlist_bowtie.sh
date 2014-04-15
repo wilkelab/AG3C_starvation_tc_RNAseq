@@ -1,8 +1,9 @@
 #!/bin/bash
 
-SRC_DIR=$HOME/Ecoli_RNAseq/scripts/
+SRC_DIR=$HOME/Ecoli_RNAseq/scripts
 
 read_1=($SCRATCH/data/raw_reads/unanalyzed/MURI_*_R1_001.fastq)
+##look into processed directory 
 
 rm -f $SCRATCH/data/paramlist_bowtie
 
