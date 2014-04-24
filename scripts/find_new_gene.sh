@@ -1,8 +1,5 @@
 ##Sort bowtie output file for cufflinks
-echo "sort -k 3,3 -k 4,4n ${BASE_NAME}_aligned.sam > ${BASE_NAME}_bowtie_out_r1_sorted.sam"
-if [[ ! $TEST = "true" ]]; then 
-   sort -k 3,3 -k 4,4n ${BASE_NAME}_aligned.sam > ${BASE_NAME}_bowtie_out_r1_sorted.sam
-fi 
+
 
 ##calculate FPKMs using sorted bowtie output
 echo "cufflinks -p 3 -o ${BASE_NAME}_nc_cufflinks_out -G $HOME/Ecoli_RNAseq/reference_seqs/final_reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_bowtie_out_sorted.sam"

@@ -32,6 +32,8 @@ def read_bowtie_both_reads(file,reads_trimmed):
 	for line in bowtie_file_lst:
 		m = re.match( r'(\d+)\s+reads; of these:', line)
 		if m: 
+			print line
+			print m.group(1)
 			total_reads_for_mapping = int( m.group(1) )
 			break 
 
@@ -67,8 +69,8 @@ def read_bowtie_one_read(file,reads_trimmed):
 			percent_mapped_reads = float( m.group(1) )
 			break
 
-	if (reads_trimmed != total_reads_for_mapping):
-		print("Warning: reads trimmed and written by flexbar does not equal the total number of reads processed by bowtie")
+	#if (reads_trimmed != total_reads_for_mapping):
+		#print("Warning: reads trimmed and written by flexbar does not equal the total number of reads processed by bowtie")
 
 	reads_mapped = percent_mapped_reads/100*float(total_reads_for_mapping)
 	bowtie_file.close()
@@ -81,7 +83,7 @@ def count_bases(file):
 	i = 0
 	
 	
-	for line in reads_file.readlines():
+	for line in reads_file:	
 		m = re.match( r'^([AGCTN]+)$', line.strip())
 		if m: 
 			count_bases += len(m.group(1))
@@ -119,38 +121,44 @@ def count_nc_rna(file,reads_mapped):
 	count_ncRNA = 0
 	
 	for line in count_rna_file.readlines():
-		m = re.match(r'.+oId \"RF.+',line)
+		m = re.match(r'RF.+\s+(\d+)',line)
 		if m:
-			count_ncRNA += 1
+			count_ncRNA += int(m.group(1))
 			
 	percent_ncRNA = count_ncRNA/float(reads_mapped)*100
 	return (percent_ncRNA)
 		
 def main():
-	(total_reads_flexbar, percent_reads_remaining, reads_trimmed) = read_flexbar(sys.argv[1])
-	(both_reads_mapped, percent_mapped_both_reads) = read_bowtie_both_reads(sys.argv[2],reads_trimmed)
-	(read1_mapped, percent_mapped_read1) = read_bowtie_one_read(sys.argv[3],reads_trimmed)
-	(read2_mapped, percent_mapped_read2) = read_bowtie_one_read(sys.argv[4],reads_trimmed)
-	(total_reads_raw_fastq, base_count_raw, mean_raw_read_length) = count_bases(sys.argv[5])
-	(total_reads_trimmed_fastq, base_count_trimmed, mean_trimmed_read_length) = count_bases(sys.argv[6])
-	(count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA) = count_rna_type(sys.argv[7],read1_mapped)	 
-	(percent_ncRNA) = count_nc_rna(sys.argv[7], both_reads_mapped)
+	##python $HOME/Ecoli_RNAseq/scripts/quality_control.py ${BASE_NAME}_R1_001.fastq ${READS_1}_trimmed.fastq ${READS_1}_R2_bowtie.out ${READS_1}_bowtie.out ${READS_2}_bowtie.out ${READS_1}_raw_rna_count.txt
+	##process flexbar output: 
+	(total_reads_raw_fastq, base_count_raw, mean_raw_read_length) = count_bases(sys.argv[1])
+	(total_reads_trimmed_fastq, base_count_trimmed, mean_trimmed_read_length) = count_bases(sys.argv[2])
+	
+	percent_reads_remaining = float(total_reads_trimmed_fastq)/total_reads_raw_fastq*100
+	percent_base_remaining = float(base_count_trimmed)/base_count_raw*100
+	
+	print total_reads_trimmed_fastq
+	
+	(both_reads_mapped, percent_mapped_both_reads) = read_bowtie_both_reads(sys.argv[3],total_reads_trimmed_fastq)
+	(read1_mapped, percent_mapped_read1) = read_bowtie_one_read(sys.argv[4],total_reads_trimmed_fastq)
+	(read2_mapped, percent_mapped_read2) = read_bowtie_one_read(sys.argv[5],total_reads_trimmed_fastq)
+	
+	(count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA) = count_rna_type(sys.argv[6],read1_mapped)	 
+	(percent_ncRNA) = count_nc_rna(sys.argv[6], read1_mapped)
 	##make output file
 
-	percent_base_remaining = float(base_count_trimmed)/base_count_raw*100
-
-	m = re.match(r'^(MURI_\d+_SA\d+_[AGCT]+_L\d+)_\w+',sys.argv[1])	
+	m = re.match(r'^(MURI_\d+.*SA\d+_.*).fastq',sys.argv[1])	
 	if m:
 		sample = m.group(1)
-	m2 = re.match(r'^(MURI_\d+)\w+', sample)
+	m2 = re.match(r'^(MURI_.*)SA\d+\w+', sample)
 	if m2:
 		sample_name = m2.group(1)
 		
 	outFile = open(sample+"_quality_control.txt","w")
 		
 	##write number of reads trimmed and discarded from flexbar
-	outFile.write("sample\ttime\ttotal_read_count\ttotal_base_count\tmean_raw_read_length\ttrimmed_read_count\tpercent_reads_remaining\ttrimmed_base_count\tpercent_base_remaining\tmean_trimmed_read_length\tmapped_both_read_count\tpercent_trimmed_both_reads_mapped\tmapped_read_1_count\tpercent_read_1_mapped\tmapped_read_2_count\tpercent_read_2_mapped\tcount_read_1_mapping_mRNA\tpercent_read_1_mapping_mRNA\tpercent_read_1_mapping_tRNA\tpercent_read_1_mapping_to_rRNA\tpercent_read_1_mapping_to_ncRNA\n")
-	row = "%s\ttime\t%i\t%i\t%i\t%i\t%.4g\t%i\t%.4g\t%i\t%i\t%.4g\t%i\t%.4g\t%i\t%.4g\t%i\t%.4g\t%.4g\t%.4g\t%.4g\n" % (sample_name, total_reads_flexbar, base_count_raw, mean_raw_read_length, reads_trimmed, percent_reads_remaining, base_count_trimmed, percent_base_remaining, mean_trimmed_read_length, both_reads_mapped, percent_mapped_both_reads, read1_mapped, percent_mapped_read1, read2_mapped, percent_mapped_read2, count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA, percent_ncRNA )
+	outFile.write("sample\ttime\traw_read_count\traw_base_count\tmean_raw_read_length\ttrimmed_read_count\tpercent_reads_remaining\ttrimmed_base_count\tpercent_base_remaining\tmean_trimmed_read_length\tmapped_both_read_count\tpercent_trimmed_both_reads_mapped\tmapped_read_1_count\tpercent_read_1_mapped\tmapped_read_2_count\tpercent_read_2_mapped\tcount_read_1_mapping_mRNA\tpercent_read_1_mapping_mRNA\tpercent_read_1_mapping_tRNA\tpercent_read_1_mapping_to_rRNA\tpercent_read_1_mapping_to_ncRNA\n")
+	row = "%s\ttime\t%i\t%i\t%i\t%i\t%.4g\t%i\t%.4g\t%i\t%i\t%.4g\t%i\t%.4g\t%i\t%.4g\t%i\t%.4g\t%.4g\t%.4g\t%.4g\n" % (sample_name, total_reads_raw_fastq, base_count_raw, mean_raw_read_length, total_reads_trimmed_fastq, percent_reads_remaining, base_count_trimmed, percent_base_remaining, mean_trimmed_read_length, both_reads_mapped, percent_mapped_both_reads, read1_mapped, percent_mapped_read1, read2_mapped, percent_mapped_read2, count_mRNA, percent_mRNA, percent_tRNA, percent_rRNA, percent_ncRNA )
 	outFile.write(row)
 	outFile.close()
 

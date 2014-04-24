@@ -13,10 +13,10 @@
 # 
 #         <------ Setup Parameters ------>
 #$ -N bowtie 
-#$ -pe 4way 192
+#$ -pe 2way 24
 #$ -q normal
-#$ -o bowtie.o$JOB_ID
-#$ -l h_rt=24:00:00
+#$ -o concatenate.o$JOB_ID
+#$ -l h_rt=5:00:00
 #$ -V
 #$ -M daria.sydykova@gmail.com
 #$ -m be
@@ -33,14 +33,9 @@
 # 	#$ -o <job output file>
 #	   NOTE: The env variable $JOB_ID contains the job id. 
 #
-module load launcher
-module load bowtie
-module load tophat
-module load cufflinks/2.1.1
-module load bedtools
-module load samtools
+module load python
 setenv EXECUTABLE     $TACC_LAUNCHER_DIR/init_launcher 
-setenv CONTROL_FILE   paramlist_bowtie
+setenv CONTROL_FILE   paramlist_concatenate
 setenv WORKDIR        $SCRATCH/data
 # 
 # Variable description:

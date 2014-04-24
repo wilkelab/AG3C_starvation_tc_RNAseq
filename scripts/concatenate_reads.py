@@ -50,7 +50,7 @@ def createMergeCommand_old( bname, files, read, destdir ):
 workdir = sys.argv[1]
 (root, ext) = splitext(workdir.rstrip('/'))
 destdir = root+".processed/"
-	
+
 all_files = [ f for f in listdir(workdir) if isfile(join(workdir,f)) ]
 
 basenames = {}
