@@ -90,7 +90,6 @@ if [[ ! $TEST = "true" ]]; then
 	htseq-count -m union -t exon -i nearest_ref ${READS_1}_aligned_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/final_reference_seqs/REL606_nc_tss_no_dupl.gtf > ${READS_1}_raw_rna_count.txt 2>> ${LOGFILE}
 fi
 
-TEST="false"
 ##quality control 
 echo "python $HOME/Ecoli_RNAseq/scripts/quality_control.py ${READS_1}.fastq ${READS_1}_trimmed.fastq ${READS_1}_R2_bowtie.out ${READS_1}_bowtie.out ${READS_2}_bowtie.out ${READS_1}_raw_rna_count.txt" 
 if [[ ! $TEST = "true" ]]; then
@@ -103,3 +102,4 @@ fi
 #if [[ ! $TEST = "true" ]]; then
 #	python $HOME/Ecoli_RNAseq/scripts/calculate_norm_fpkm.py $HOME/Ecoli_RNAseq/reference_seqs/final_reference_seqs/REL606_nc_tss_no_dupl.gtf ${BASE_NAME}_htseq_count_r1.txt
 #fi	
+
