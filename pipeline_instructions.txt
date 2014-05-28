@@ -52,8 +52,28 @@ cat sample*/RNA/*depleted.processed/*_quality_control.txt > quality_control_gluc
 
 Open this file in excel and delete every other line that contains headers from each sample (cat function adds all of the lines in each sample).
 
+11. To copy the new data generated to hydra, change into Ecoli_RNAseq/src/. Change DATA_DIR, SAMPLES, DEST_DIR, and TAR_NAME in both make_tar_processed.sh and make_tar_raw.sh. Run both of them:
+ 
+./make_tar_processed.sh   
+./make_tar_raw.sh
 
+This scripts will write tar files for raw and processed read files (ex:TAR_NAME_processed.tar, TAR_NAME_raw.tar). 
 
+12.  Step 11 also generates md5sum files (TAR_NAME.md5sum). These are needed to make sure that the tar files copied to hydra are identical to the ones on lonestar. Change into the directory with tar files and copy them to hydra:
+
+scp TAR_NAME_processed.tar TAR_NAME_raw.tar username@phylocluster.ccbb.utexas.edu:/share/WilkeLab/AG3C/data/experiments/*_time_course/* 
+
+13. Log in to hydra and change into the directory where tar files are. Run:
+
+md5sum TAR_NAME_processed.tar > TAR_NAME_processed.md5sum
+md5sum TAR_NAME_raw.tar > TAR_NAME_raw.md5sum
+
+Check that the value given in the TAR_NAME_*.md5sum matches the value given in the TAR_NAME_*.md5sum on lonestar directory. If they are not the same, tar files need to be recopied unto hydra. 
+
+14. Unfold the tar files on hydra:
+
+tar -xvf TAR_NAME_processed.tar
+tar -xvf TAR_NAME_raw.tar
 
 
  
