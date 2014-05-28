@@ -1,2 +1,0 @@
-sample	time	total_read_count	total_base_count	trimmed_read_count	percent_reads_remaining	trimmed_base_count	mapped_read_count	percent_trimmed_reads_mapped	count_mapping_mRNA	percent_mapping_mRNA	percent_mapping_tRNA	percent_mapping_to_rRNA
-MURI_16	time	2094617	217624397	1634505	78.03	83226907	1287989	78.8	673446	52.29	24.41	1.627
