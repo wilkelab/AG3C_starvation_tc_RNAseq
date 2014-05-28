@@ -1,9 +1,9 @@
 Ecoli_RNAseq
 ============
 
-*reference_seqs
+* reference_seqs
 all sequence files that have been generated in the process or needed for the pipeline
-*adaptors.fna
+* adaptors.fna
 	Contains all adaptor sequences used for trimming by flexbar
 	
 *final_reference_seqs
