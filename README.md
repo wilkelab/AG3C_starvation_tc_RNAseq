@@ -37,7 +37,7 @@ Ecoli_RNAseq
 
 * scripts
 
-all script files used to run the pipeline
+	all script files used to run the pipeline
 
 	* write_paramlist_bowtie.sh - writes paramlist_bowtie by finding all the MURI_*_R1_*.fastq within the directory and creating MURI_*_R1_*.fastq for given R1 file. paramlist_bowtie file with bowtie_commands.sh to be ran on reads1 and reads2. bowtie_launcher.sge executes paramlist_bowtie 
 
