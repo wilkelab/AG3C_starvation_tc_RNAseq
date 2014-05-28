@@ -1,23 +1,23 @@
 Ecoli_RNAseq
 ============
 
->reference_seqs
+*reference_seqs
 all sequence files that have been generated in the process or needed for the pipeline
-	>adaptors.fna
-		Contains all adaptor sequences used for trimming by flexbar
+*adaptors.fna
+	Contains all adaptor sequences used for trimming by flexbar
 	
-	>final_reference_seqs
-		Contains final sequence files used to run the analysis. Most of the sequence in this directory have been modified from original versions
-		Contains all generated reference sequences.
-		REL606.fa/.fai - original untampered fasta files with Ecoli DNA sequence
-		REL606_nc_tss_no_dupl.gtf - modified REL606.gtf file that contains non-coding RNAs and formatted tss column. There are also no duplicate entries present in this file (unlike REL606.gtf)
-		REL606_nc_tss_no_dupl_rRNAtRNA.gtf - REL606_nc_tss_no_dupl.gtf file with only tRNAs and rRNAs (needed by cuffdiff to weed out tRNAs and rRNAs)
+*final_reference_seqs
+	Contains final sequence files used to run the analysis. Most of the sequence in this directory have been modified from original versions
+	Contains all generated reference sequences.
+	REL606.fa/.fai - original untampered fasta files with Ecoli DNA sequence
+	REL606_nc_tss_no_dupl.gtf - modified REL606.gtf file that contains non-coding RNAs and formatted tss column. There are also no duplicate entries present in this file (unlike REL606.gtf)
+	REL606_nc_tss_no_dupl_rRNAtRNA.gtf - REL606_nc_tss_no_dupl.gtf file with only tRNAs and rRNAs (needed by cuffdiff to weed out tRNAs and rRNAs)
 
-	>edited_reference_seqs
-		Contains original and modified reference sequences made in the process for different functions.
+>edited_reference_seqs
+	Contains original and modified reference sequences made in the process for different functions.
 	
-	>indexes
-		Contains index files generated from REL606.fa and used by bowtie2. It also contains original untampered REL606.fa. Bowtie2 requires a fasta file within this folder for proper functioning
+>indexes
+	Contains index files generated from REL606.fa and used by bowtie2. It also contains original untampered REL606.fa. Bowtie2 requires a fasta file within this folder for proper functioning
 
 > job_submissions_files
 files used to submit a job on TACC
