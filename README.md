@@ -2,9 +2,12 @@ Ecoli_RNAseq
 ============
 
 * reference_seqs
-	all sequence files that have been generated in the process or needed for the pipeline
+
+all sequence files that have been generated in the process or needed for the pipeline
+
 * adaptors.fna
-	Contains all adaptor sequences used for trimming by flexbar
+	
+Contains all adaptor sequences used for trimming by flexbar
 	
 * final_reference_seqs
 	Contains final sequence files used to run the analysis. Most of the sequence in this directory have been 			modified from original versions
