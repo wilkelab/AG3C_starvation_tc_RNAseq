@@ -48,8 +48,7 @@ def main():
 			sample_name = m2.group(1)
 	
 	##glucose time course dictionary = {'sample_name': ['time', 'replicate'] }
-	glucose_experiment = {'MURI_97': [3,1] , 'MURI_98': [4,1], 'MURI_99': [5,1], 'MURI_100': [6,1], 'MURI_101': [8,1], 'MURI_102': [24,1], 'MURI_103': [48,1], 'MURI_104': [168,1], 'MURI_105': [336,1], 'MURI_16': [3,2] , 'MURI_17': [4,2], 'MURI_18': [5,2], 'MURI_19': [6,2], 'MURI_20': [8,2], 'MURI_21': [24,2], 'MURI_22': [48,2], 'MURI_23': [168,2], 'MURI_24': [336,2], 'MURI_25': [3,3] , 'MURI_26': [4,3], 'MURI_27': [5,3], 'MURI_28': [6,3], 'MURI_29': [8,3], 'MURI_30': [24,3], 'MURI_31': [48,3], 'MURI_32': [168,3], 'MURI_33': [336,3] } 
-	
+	glucose_experiment = {'MURI_34': [3,1] , 'MURI_35': [4,1], 'MURI_36': [5,1], 'MURI_37': [6,1], 'MURI_38': [8,1], 'MURI_39': [24,1], 'MURI_40': [48,1], 'MURI_41': [168,1], 'MURI_42': [336,1] } 
 	
 	outFile = open(	tRNA_norm_counts_table, "a" )
 	if (os.path.exists(tRNA_norm_counts_table) and sample_name in glucose_experiment):

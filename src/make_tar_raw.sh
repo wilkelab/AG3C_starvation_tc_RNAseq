@@ -24,4 +24,6 @@ done
 
 tar cvfz $DEST_DIR/$TAR_NAME --files-from=${FILELIST}
 
+md5sum $DEST_DIR/$TAR_NAME > $DEST_DIR/$TAR_NAME.md5sum
+
 rm -f $FILELIST
