@@ -13,7 +13,7 @@ for ((i=0;i<${#all_raw_rna_files[@]};i++)); do
 	READS_1=`echo ${all_raw_rna_files[$i]} | grep -o "MURI_[0-9]\+_[a-zA-Z0-9_+]*_R1"`
 	echo "READS_1: $READS_1"
 	read_file=${all_raw_rna_files[$i]}  
-	echo "cd ${all_work_dir[$1]}" >> $SCRATCH/data/paramlist_tRNA_count  
+	echo "cd ${all_work_dir[$i]}" >> $SCRATCH/data/paramlist_tRNA_count  
 	echo "python $HOME/Ecoli_RNAseq/src/trna_fraction.py $HOME/Ecoli_RNAseq/reference_seqs/final_reference_seqs/REL606_nc_tss_no_dupl.gtf ${READS_1}_raw_rna_count.txt ${READS_1}_trna_norm_counts.txt" >> $SCRATCH/data/paramlist_tRNA_count
 done
 

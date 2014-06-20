@@ -3,7 +3,7 @@
 
 ##this script runs in sample*/RNA/*depleted.processed
 TEST="false"
-#TEST="true"
+TEST="true"
 
 READS_1=`echo ${1}*R1.fastq | grep -o "MURI_[0-9]\+_[a-zA-Z0-9_+]*_R1"`
 READS_2=`echo ${1}*R2.fastq | grep -o "MURI_[0-9]\+_[a-zA-Z0-9_+]*_R2"`
@@ -84,11 +84,13 @@ if [[ ! $TEST = "true" ]]; then
    samtools view -h -o ${READS_1}_aligned_sorted.sam ${READS_1}_aligned_sorted.bam 2>> ${LOGFILE}
 fi
 
+TEST="false"
 ##get raw counts for reads mapped
-echo "htseq-count -m union -t exon -i nearest_ref ${READS_1}_aligned_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/final_reference_seqs/REL606_nc_tss_no_dupl.gtf > ${READS_1}_raw_rna_count.txt" >> ${LOGFILE}
+echo "htseq-count -m union -t exon -i transcript_id ${READS_1}_aligned_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/edited_reference_seqs/REL606_nc.gtf  > ${READS_1}_raw_rna_count.txt" ##>> ${LOGFILE}
 if [[ ! $TEST = "true" ]]; then
-	htseq-count -m union -t exon -i nearest_ref ${READS_1}_aligned_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/final_reference_seqs/REL606_nc_tss_no_dupl.gtf > ${READS_1}_raw_rna_count.txt 2>> ${LOGFILE}
+	htseq-count -m union -t exon -i transcript_id ${READS_1}_aligned_sorted.sam $HOME/Ecoli_RNAseq/reference_seqs/edited_reference_seqs/REL606_nc.gtf  > ${READS_1}_raw_rna_count.txt ##2>> ${LOGFILE}
 fi
+TEST="true"
 
 ##quality control 
 echo "python $HOME/Ecoli_RNAseq/src/quality_control.py ${READS_1}.fastq ${READS_1}_trimmed.fastq ${READS_1}_R2_bowtie.out ${READS_1}_bowtie.out ${READS_2}_bowtie.out ${READS_1}_raw_rna_count.txt" 

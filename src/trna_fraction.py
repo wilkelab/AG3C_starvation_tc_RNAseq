@@ -50,17 +50,16 @@ def main():
 	##glucose time course dictionary = {'sample_name': ['time', 'replicate'] }
 	glucose_experiment = {'MURI_34': [3,1] , 'MURI_35': [4,1], 'MURI_36': [5,1], 'MURI_37': [6,1], 'MURI_38': [8,1], 'MURI_39': [24,1], 'MURI_40': [48,1], 'MURI_41': [168,1], 'MURI_42': [336,1] } 
 	
-	outFile = open(	tRNA_norm_counts_table, "a" )
-	if (os.path.exists(tRNA_norm_counts_table) and sample_name in glucose_experiment):
+	outFile = open(	tRNA_norm_counts_table, "w" )
+	outFile.write('tRNA_norm_count\tgene_name\taa_name\ttime\tsample\treplicate\n')	
+	
+	if (sample_name in glucose_experiment):
 		for tRNA_gene_name in tRNA_norm_counts:
 			aa_name = tRNA_gene_name[:3]
 			(time, replicate) = glucose_experiment[sample_name]
 			row = '%f\t%s\t%s\t%i\t%s\t%i\n' %(tRNA_norm_counts[tRNA_gene_name], tRNA_gene_name, aa_name, time, sample_name, replicate )
 			outFile.write(row)	
-	else:
-		outFile.write('tRNA_norm_count\tgene_name\taa_name\ttime\tsample\replicate\n')	
-	
-	
+
 	return(0)
 	
 	

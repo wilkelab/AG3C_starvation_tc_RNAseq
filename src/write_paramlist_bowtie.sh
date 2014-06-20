@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SRC_DIR=$HOME/Ecoli_RNAseq/src
-TIME_COURSE_DIR=glycerol_time_course
+TIME_COURSE_DIR=glucose_time_course
 
 all_read_files=($SCRATCH/data/${TIME_COURSE_DIR}/sample*/RNA/*.processed/)
 ##look into processed directory 
